@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS vehiculos(
 );
 
 CREATE TABLE IF NOT EXISTS colision_persona(
+    collision_id TEXT,
     person_id TEXT,
     person_type TEXT,
     person_injury TEXT,
@@ -72,11 +73,11 @@ CREATE TABLE IF NOT EXISTS colision_persona(
     ped_role TEXT,
     contributing_factor_1 TEXT,
     contributing_factor_2 TEXT,
-    person_sex TEXT,
-    collision_id TEXT
+    person_sex TEXT
 );
 
 CREATE TABLE IF NOT EXISTS colision_vehiculos(
+    collision_id TEXT,
     vehicle_id TEXT,
     travel_direction TEXT,
     vehicle_occupants TEXT,
@@ -92,13 +93,12 @@ CREATE TABLE IF NOT EXISTS colision_vehiculos(
     public_property_damage TEXT,
     public_property_damage_type TEXT,
     contributing_factor_1 TEXT,
-    contributing_factor_2 TEXT,
-    collision_id TEXT
+    contributing_factor_2 TEXT
 );
 
 COPY temporal.accidentes
 FROM 'C:\Collisions_Crashes_20241020.csv'
-WITH CSV HEADER NULL '' DELIMITER ',';
+WITH (FORMAT csv, HEADER true, DELIMITER ',', NULL '', QUOTE '"', ESCAPE '"');
 
 COPY temporal.persona
 FROM 'C:\personas2.csv'
@@ -110,7 +110,7 @@ WITH CSV HEADER NULL '' DELIMITER ';';
 
 COPY temporal.colision_persona
 FROM 'C:\Collisions_Person_20241020.csv'
-WITH DELIMITER ',' CSV HEADER;
+WITH (FORMAT csv, HEADER true, DELIMITER ',', NULL '', QUOTE '"', ESCAPE '"');
 
 COPY temporal.colision_vehiculos
 FROM 'C:\Collisions_Vehicles_20241020.csv'
