@@ -1,3 +1,11 @@
+SET datestyle TO 'MDY';
+
+CREATE database PECL2;
+
+CREATE SCHEMA IF NOT EXISTS temporal;
+
+CREATE SCHEMA IF NOT EXISTS final;
+
 CREATE TABLE IF NOT EXISTS accidentes(
     crash_date TEXT,
     crash_time TEXT,
@@ -41,7 +49,6 @@ CREATE TABLE IF NOT EXISTS persona(
 
 CREATE TABLE IF NOT EXISTS vehiculos(
     vehicle_id TEXT,
-    state_registration TEXT,
     vehicle_type TEXT,
     vehicle_make TEXT,
     vehicle_model TEXT,
@@ -89,22 +96,22 @@ CREATE TABLE IF NOT EXISTS colision_vehiculos(
     collision_id TEXT
 );
 
-COPY accidentes
+COPY temporal.accidentes
 FROM 'C:\Collisions_Crashes_20241020.csv'
 WITH CSV HEADER NULL '' DELIMITER ',';
 
-COPY persona
+COPY temporal.persona
 FROM 'C:\personas2.csv'
-WITH CSV HEADER NULL '' DELIMITER ';';
+WITH CSV HEADER NULL '' DELIMITER ';' QUOTE '"';
 
-COPY vehiculos
+COPY temporal.vehiculos
 FROM 'C:\Vehicles.csv'
 WITH CSV HEADER NULL '' DELIMITER ';';
 
-COPY colision_persona
+COPY temporal.colision_persona
 FROM 'C:\Collisions_Person_20241020.csv'
-WITH CSV HEADER NULL '' DELIMITER ',';
+WITH DELIMITER ',' CSV HEADER;
 
-COPY colision_vehiculos
+COPY temporal.colision_vehiculos
 FROM 'C:\Collisions_Vehicles_20241020.csv'
 WITH CSV HEADER NULL '' DELIMITER ',';
