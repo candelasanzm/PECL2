@@ -89,8 +89,22 @@ CREATE TABLE IF NOT EXISTS colision_vehiculos(
     collision_id TEXT
 );
 
-COPY accidente
+COPY accidentes
 FROM 'C:\Collisions_Crashes_20241020.csv'
 WITH CSV HEADER NULL '' DELIMITER ',';
 
-COPY
+COPY persona
+FROM 'C:\personas2.csv'
+WITH CSV HEADER NULL '' DELIMITER ';';
+
+COPY vehiculos
+FROM 'C:\Vehicles.csv'
+WITH CSV HEADER NULL '' DELIMITER ';';
+
+COPY colision_persona
+FROM 'C:\Collisions_Person_20241020.csv'
+WITH CSV HEADER NULL '' DELIMITER ',';
+
+COPY colision_vehiculos
+FROM 'C:\Collisions_Vehicles_20241020.csv'
+WITH CSV HEADER NULL '' DELIMITER ',';
