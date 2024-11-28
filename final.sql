@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS accidentes(
     contributing_factor_vehicle_3 text,
     contributing_factor_vehicle_4 text,
     contributing_factor_vehicle_5 text,
-    collision_id varchar(10) not null,
+    collision_id varchar(10) not null
 );
 
 CREATE TABLE IF NOT EXISTS persona(
@@ -88,9 +88,82 @@ CREATE TABLE IF NOT EXISTS  colision_vehiculos(
     collision_id varchar(10) not null
 );
 
-INSERT INTO final.accidentes ()
+INSERT INTO final.accidentes (crash_date,
+                              crash_time,
+                              borough,
+                              zip_code,
+                              latitude,
+                              longitude,
+                              location,
+                              on_street_name,
+                              cross_street_name,
+                              off_street_name,
+                              number_of_persons_injured,
+                              number_of_persons_killed,
+                              number_of_pedestrians_injured,
+                              number_of_pedestrians_killed,
+                              number_of_cyclists_injured,
+                              number_of_cyclists_killed,
+                              number_of_motorists_injured,
+                              number_of_motorists_killed,
+                              contributing_factor_vehicle_1,
+                              contributing_factor_vehicle_2,
+                              contributing_factor_vehicle_3,
+                              contributing_factor_vehicle_4,
+                              contributing_factor_vehicle_5,
+                              collision_id)
+SELECT
+    CAST(crash_date AS date check(crash_date between '2013-01-01' and '2024-01-01')),
+    CAST(crash_time AS time without time zone),
+    CAST(borough AS varchar(512)),
+    CAST(zip_code AS serial check(zip_code between 1 and 99999)),
+    CAST(latitude AS decimal check(latitude between -90 and 90)),
+    CAST(longitude AS decimal check(longitude between -90 and 90)),
+    CAST(location AS varchar(512)),
+    CAST(on_street_name AS varchar(512)),
+    CAST(cross_street_name AS varchar(512)),
+    CAST(off_street_name AS varchar(512)),
+    CAST(number_of_persons_injured AS smallint check (number_of_persons_injured >= 0)),
+    CAST(number_of_persons_killed AS smallint check (number_of_persons_killed>=0)),
+    CAST(number_of_pedestrians_injured AS smallint check (number_of_pedestrians_injured>=0)),
+    CAST(number_of_pedestrians_killed AS smallint check (number_of_pedestrians_killed>=0)),
+    CAST(number_of_cyclists_injured AS smallint check (number_of_cyclists_injured>=0)),
+    CAST(number_of_cyclists_killed AS smallint check (number_of_cyclists_killed>=0)),
+    CAST(number_of_motorists_injured AS smallint check (number_of_motorists_injured>=0)),
+    CAST(number_of_motorists_killed AS smallint check (number_of_motorists_killed>=0)),
+    CAST(contributing_factor_vehicle_1 AS text),
+    CAST(contributing_factor_vehicle_2 AS text),
+    CAST(contributing_factor_vehicle_3 AS text),
+    CAST(contributing_factor_vehicle_4 AS text),
+    CAST(contributing_factor_vehicle_5 AS text),
+    CAST(collision_id AS varchar(10) not null)
+FROM temporal.accidentes;
 
-INSERT INTO final.persona()
+INSERT INTO final.persona(person_id,
+                          person_sex,
+                          person_lastName,
+                          person_firstName,
+                          person_phone,
+                          person_address,
+                          person_city,
+                          person_state,
+                          person_zip,
+                          person_ssn,
+                          person_dob)
+SELECT(
+    CAST(person_id AS varchar(512) not null),
+    CAST(person_sex AS char(1) check(person_sex in ('M', 'F', 'U'))),
+    CAST(person_lastName AS varchar(50)),
+    CAST(person_firstName AS varchar(50)),
+    CAST(person_phone AS text),
+    CAST(person_address AS varchar(200)),
+    CAST(person_city AS varchar(100)),
+    CAST(person_state AS varchar(100)),
+    CAST(person_zip AS serial check(person_zip between 1 and 99999)),
+    CAST(person_ssn AS varchar(11)),
+    CAST(person_dob AS date)
+)
+FROM temporal.persona;
 
 INSERT INTO vehiculos(vehicle_id,
                       vehicle_year,
@@ -104,3 +177,80 @@ SELECT
     CAST(vehicle_model AS VARCHAR(50)),
     CAST(vehicle_year AS SMALLINT)
 FROM temporal.vehiculos;
+
+INSERT INTO colision_persona(person_id,
+                             person_type,
+                             person_injury,
+                             vehicle_id,
+                             person_age,
+                             ejection,
+                             emotional_status,
+                             bodily_injury,
+                             position_in_vehicle,
+                             safety_equipment,
+                             ped_location,
+                             complaint,
+                             ped_role,
+                             contributing_factor_1,
+                             contributing_factor_2,
+                             person_sex,
+                             collision_id)
+SELECT(
+    CAST(person_id AS varchar(512) not null),
+    CAST(person_type AS varchar(50)),
+    CAST(person_injury AS varchar(50)),
+    CAST(vehicle_id AS bigserial not null),
+    CAST(person_age AS smallint),
+    CAST(ejection AS varchar(50)),
+    CAST(emotional_status AS varchar(50)),
+    CAST(bodily_injury AS varchar(512)),
+    CAST(position_in_vehicle AS varchar(1000)),
+    CAST(safety_equipment AS varchar(512)),
+    CAST(ped_location AS varchar(1000)),
+    CAST(ped_action AS varchar(1000)),
+    CAST(complaint AS varchar(512)),
+    CAST(ped_role AS varchar(50)),
+    CAST(contributing_factor_1 AS text),
+    CAST(contributing_factor_2 AS text),
+    CAST(person_sex AS char(1) check(person_sex in ('M', 'F', 'U'))),
+    CAST(collision_id AS varchar(10) not null)
+)
+FROM temporal.colision_persona;
+
+INSERT INTO colision_vehiculos(vehicle_id,
+                               travel_direction,
+                               vehicle_occupants,
+                               driver_sex,
+                               driver_license_status,
+                               driver_license_jurisdiction,
+                               pre_crash,
+                               point_of_impact,
+                               vehicle_damage_1,
+                               vehicle_damage_2,
+                               vehicle_damage_3,
+                               vehicle_damage_4,
+                               public_property_damage,
+                               public_property_damage_type,
+                               contributing_factor_1,
+                               contributing_factor_2,
+                               collision_id)
+SELECT(
+    CAST(vehicle_id AS varchar(512) not null),
+    CAST(travel_direction AS varchar(20)),
+    CAST(vehicle_occupants AS smallserial),
+    CAST(driver_sex AS bpchar(1) check (driver_sex in ('U','F','M'))),
+    CAST(driver_license_status AS varchar(20)),
+    CAST(driver_license_jurisdiction AS bpchar(2)),
+    CAST(pre_crash AS varchar(100)),
+    CAST(point_of_impact AS varchar(512)),
+    CAST(vehicle_damage_1 AS varchar(512)),
+    CAST(vehicle_damage_2 AS varchar(512)),
+    CAST(vehicle_damage_3 AS varchar(512)),
+    CAST(vehicle_damage_4 AS varchar(512)),
+    CAST(public_property_damage AS varchar(20)),
+    CAST(public_property_damage_type AS text),
+    CAST(contributing_factor_1 AS text),
+    CAST(contributing_factor_2 AS text),
+    CAST(collision_id AS varchar(10) not null)
+)
+FROM temporal.colision_vehiculos;
