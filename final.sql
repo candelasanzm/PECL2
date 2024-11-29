@@ -22,11 +22,12 @@ CREATE TABLE IF NOT EXISTS accidentes(
     contributing_factor_vehicle_3 text,
     contributing_factor_vehicle_4 text,
     contributing_factor_vehicle_5 text,
-    collision_id varchar(10) not null
+    collision_id varchar(10) not null,
+    constraint accidentes_pk primary key(collision_id)
 );
 
 CREATE TABLE IF NOT EXISTS persona(
-    person_id varchar(512) not null,
+    person_id varchar(512),
     person_sex char(1) check(person_sex in ('M', 'F', 'U')),
     person_lastName varchar(50),
     person_firstName varchar(50),
@@ -36,7 +37,8 @@ CREATE TABLE IF NOT EXISTS persona(
     person_state varchar(100),
     person_zip numeric check(person_zip between 1 and 99999),
     person_ssn varchar(11),
-    person_dob date
+    person_dob date,
+    constraint persona_pk primary key (person_id)
 );
 
 CREATE TABLE IF NOT EXISTS vehiculos(
@@ -44,14 +46,16 @@ CREATE TABLE IF NOT EXISTS vehiculos(
     vehicle_year smallint check(vehicle_year between 1000 and 2024 or null),
     vehicle_type varchar(512),
     vehicle_model varchar(50),
-    vehicle_make varchar(50)
+    vehicle_make varchar(50),
+    state_registration bpchar(2)
+    --constraint vehiculos_pk primary key (vehicle_id)
 );
 
 CREATE TABLE IF NOT EXISTS colision_persona(
-    person_id varchar(512) not null,
+    person_id varchar(512),
     person_type varchar(50),
     person_injury varchar(50),
-    vehicle_id numeric not null,
+    vehicle_id numeric,
     person_age smallint,
     ejection varchar(50),
     emotional_status varchar(50),
@@ -66,6 +70,13 @@ CREATE TABLE IF NOT EXISTS colision_persona(
     contributing_factor_2 text,
     person_sex char(1) check(person_sex in ('M', 'F', 'U')),
     collision_id varchar(10) not null
+    --constraint colision_persona_pk primary key (person_id,collision_id)
+    --constraint persona_fk foreign key (person_id) references persona(person_id) ON DELETE CASCADE ON UPDATE CASCADE
+    --constraint vehiculos_fk foreign key (vehicle_id) references vehiculos(vehicle_id) match full
+    --constraint contributing1_fk foreign key (contributing_factor_1) references accidentes(contributing_factor_vehicle_1) match full,
+    --constraint contributing2_fk foreign key (contributing_factor_2) references accidentes(contributing_factor_vehicle_2) match full,
+    --constraint personSex_fk foreign key (person_sex) references persona(person_sex) match full
+    --constraint collision_fk foreign key (collision_id) references accidentes(collision_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS  colision_vehiculos(
@@ -86,6 +97,11 @@ CREATE TABLE IF NOT EXISTS  colision_vehiculos(
     contributing_factor_1 text,
     contributing_factor_2 text,
     collision_id varchar(10) not null
+    --constraint vehicle_id_fk foreign key(vehicle_id) references vehiculos(vehicle_id) match full,
+    --constraint collision_id_fk foreign key(collision_id) references accidentes(collision_id) match full
+    --constraint contributing_factor_1_fk foreign key(contributing_factor_1) references accidentes(contributing_factor_vehicle_1) match full,
+    --constraint contributing_factor_2_fk foreign key(contributing_factor_2) references accidentes(contributing_factor_vehicle_2) match full,
+   -- constraint colision_vehiculos_pk primary key(vehicle_id,collision_id)
 );
 
 INSERT INTO final.accidentes (crash_date,
