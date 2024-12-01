@@ -43,11 +43,11 @@ CREATE TABLE IF NOT EXISTS persona(
 
 CREATE TABLE IF NOT EXISTS vehiculos(
     vehicle_id varchar(512) not null,
+    state_registration varchar(2),
     vehicle_year smallint check(vehicle_year between 1000 and 2024 or null),
     vehicle_type varchar(512),
     vehicle_model varchar(50),
-    vehicle_make varchar(50),
-    state_registration bpchar(2)
+    vehicle_make varchar(50)
     --constraint vehiculos_pk primary key (vehicle_id)
 );
 
@@ -182,17 +182,25 @@ SELECT
 FROM temporal.persona;
 
 INSERT INTO vehiculos(vehicle_id,
+                      state_registration,
                       vehicle_year,
                       vehicle_type,
                       vehicle_model,
                       vehicle_make)
-SELECT
-    CAST(vehicle_id AS VARCHAR(512)),
-    CAST(vehicle_year AS SMALLINT),
-    CAST(vehicle_type AS VARCHAR(512)),
-    CAST(vehicle_model AS VARCHAR(50)),
-    CAST(vehicle_make AS VARCHAR(50))
-FROM temporal.vehiculos;
+SELECT DISTINCT
+    CAST(v.vehicle_id AS VARCHAR(512)),
+    CAST(c.state_registration AS VARCHAR(2)),
+    CAST(v.vehicle_year AS SMALLINT),
+    CAST(v.vehicle_type AS VARCHAR(512)),
+    CAST(v.vehicle_model AS VARCHAR(50)),
+    CAST(v.vehicle_make AS VARCHAR(50))
+FROM temporal.vehiculos v
+JOIN temporal.colision_vehiculos c ON v.vehicle_id = c.vehicle_id;
+
+UPDATE final.vehiculos v
+SET state_registration = c.state_registration
+FROM temporal.colision_vehiculos c
+WHERE v.vehicle_id = c.vehicle_id;
 
 INSERT INTO colision_persona(person_id,
                              person_type,
