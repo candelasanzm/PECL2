@@ -43,12 +43,10 @@ CREATE TABLE IF NOT EXISTS persona(
 
 CREATE TABLE IF NOT EXISTS vehiculos(
     vehicle_id varchar(512) not null,
-    state_registration varchar(2),
     vehicle_year smallint check(vehicle_year between 1000 and 2024 or null),
     vehicle_type varchar(512),
     vehicle_model varchar(50),
     vehicle_make varchar(50)
-    --constraint vehiculos_pk primary key (vehicle_id)
 );
 
 CREATE TABLE IF NOT EXISTS colision_persona(
@@ -97,11 +95,6 @@ CREATE TABLE IF NOT EXISTS  colision_vehiculos(
     contributing_factor_1 text,
     contributing_factor_2 text,
     collision_id varchar(10) not null
-    --constraint vehicle_id_fk foreign key(vehicle_id) references vehiculos(vehicle_id) match full,
-    --constraint collision_id_fk foreign key(collision_id) references accidentes(collision_id) match full
-    --constraint contributing_factor_1_fk foreign key(contributing_factor_1) references accidentes(contributing_factor_vehicle_1) match full,
-    --constraint contributing_factor_2_fk foreign key(contributing_factor_2) references accidentes(contributing_factor_vehicle_2) match full,
-   -- constraint colision_vehiculos_pk primary key(vehicle_id,collision_id)
 );
 
 INSERT INTO final.accidentes (crash_date,
@@ -182,25 +175,17 @@ SELECT
 FROM temporal.persona;
 
 INSERT INTO vehiculos(vehicle_id,
-                      state_registration,
                       vehicle_year,
                       vehicle_type,
                       vehicle_model,
                       vehicle_make)
-SELECT DISTINCT
+SELECT
     CAST(v.vehicle_id AS VARCHAR(512)),
-    CAST(c.state_registration AS VARCHAR(2)),
     CAST(v.vehicle_year AS SMALLINT),
     CAST(v.vehicle_type AS VARCHAR(512)),
     CAST(v.vehicle_model AS VARCHAR(50)),
     CAST(v.vehicle_make AS VARCHAR(50))
-FROM temporal.vehiculos v
-JOIN temporal.colision_vehiculos c ON v.vehicle_id = c.vehicle_id;
-
-UPDATE final.vehiculos v
-SET state_registration = c.state_registration
-FROM temporal.colision_vehiculos c
-WHERE v.vehicle_id = c.vehicle_id;
+FROM temporal.vehiculos v;
 
 INSERT INTO colision_persona(person_id,
                              person_type,
