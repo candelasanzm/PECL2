@@ -17,7 +17,17 @@ from vehiculos
 where Antiguedad >= 35
 order by Antiguedad desc;
 
+select *
+from vehiculos
+where vehicle_year <= 1989;
+
 -- Sentencia 3
+select vehicle_make, count(final.colision_vehiculos.*) as numero_accidentes
+from vehiculos, colision_vehiculos
+where final.vehiculos.vehicle_id= final.colision_vehiculos.vehicle_id
+group by vehicle_make
+order by numero_accidentes desc
+limit 5;
 
 -- Sentencia 4 (No compila)
 select final.persona.person_id, count(accidentes.*) as NumeroAccidentes
@@ -32,10 +42,16 @@ from persona
 group by person_id
 having (select count(*) from accidentes) > 1;
 
+select final.persona.*, count(final.colision_persona.person_id) as numero_accidentes
+from persona, colision_persona
+where final.persona.person_id=final.colision_persona.person_id and final.colision_persona.person_type='driver'
+group by persona.person_id, persona.person_sex, person_lastname, person_firstname, person_phone, person_address, person_city, person_state, person_zip, person_ssn, person_dob
+having count(final.colision_persona.person_id) >1;
+
 -- Sentencia 5
 select persona.*, person_age
 from persona, colision_persona
-where final.persona.person_id = final.colision_persona.person_id
+where final.persona.person_id = final.colision_persona.person_id and final.colision_persona.person_type='driver'
     and final.colision_persona.person_age between 26 and 65
 order by person_age asc;
 
@@ -44,8 +60,27 @@ select persona.*
 from persona, vehiculos
 where vehiculos.vehicle_type in ('Pick-up');
 
--- Sentencia 7
+select distinct final.persona.*
+from persona, colision_persona, vehiculos
+where final.vehiculos.vehicle_id = final.colision_persona.vehicle_id
+    and final.colision_persona.person_id = final.persona.person_id
+where final.vehiculos.vehicle_type = 'Pick-up';
 
+
+-- Sentencia 7
+select vehicle_make, count(final.colision_vehiculos.*) as numero_accidentes
+from vehiculos, colision_vehiculos
+where final.vehiculos.vehicle_id= final.colision_vehiculos.vehicle_id
+group by vehicle_make
+order by numero_accidentes asc
+limit 3;
+
+select vehicle_type, count(final.colision_vehiculos.*) as numero_accidentes
+from vehiculos, colision_vehiculos
+where final.vehiculos.vehicle_id= final.colision_vehiculos.vehicle_id
+group by vehicle_type
+order by numero_accidentes asc
+limit 3;
 
 -- Sentencia 8 (No compila)
 select vehiculos.vehicle_make as Marca, count(accidentes.*) as NumeroAccidentesMarca
@@ -62,7 +97,7 @@ group by vehicle_make;
 select persona.person_address, persona.person_city, persona.person_state
 from persona, accidentes, colision_persona
 where persona.person_id = colision_persona.person_id
-    and accidentes.collision_id = colision_persona.collision_id;
+    and accidentes.collision_id = colision_persona.collision_id and colision_persona.person_type='driver';
 
 -- Sentencia 10 (No funciona)
 select count(accidentes.*) as NumeroAccidentes, state_registration
