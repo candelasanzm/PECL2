@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS vehiculos(
 );
 
 CREATE TABLE IF NOT EXISTS colision_persona(
-    unique_id varchar(10),
+    unique_id varchar(50) not null,
+    collision_id varchar(10) not null,
     person_id varchar(512),
     person_type varchar(50),
     person_injury varchar(50),
@@ -67,19 +68,20 @@ CREATE TABLE IF NOT EXISTS colision_persona(
     ped_role varchar(50),
     contributing_factor_1 text,
     contributing_factor_2 text,
-    person_sex char(1) check(person_sex in ('M', 'F', 'U')),
-    collision_id varchar(10) not null
+    person_sex char(1) check(person_sex in ('M', 'F', 'U'))
 );
 
-ALTER TABLE final.colision_persona ADD CONSTRAINT colision_persona_pk primary key (unique_id, collision_id);
-ALTER TABLE final.colision_persona ADD CONSTRAINT personId_fk FOREIGN KEY (person_id) REFERENCES final.persona(person_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
+--ALTER TABLE final.colision_persona ADD CONSTRAINT colision_persona_pk primary key (unique_id, collision_id);
+--ALTER TABLE final.colision_persona ADD CONSTRAINT personId_fk FOREIGN KEY (person_id) REFERENCES final.persona(person_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
 --ALTER TABLE final.colision_persona ADD CONSTRAINT vehicleId_fk FOREIGN KEY (vehicle_id) REFERENCES final.vehiculos(vehicle_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
 --ALTER TABLE final.colision_persona ADD CONSTRAINT contributing1_fk FOREIGN KEY (contributing_factor_1) REFERENCES final.accidentes(contributing_factor_vehicle_1) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
 --ALTER TABLE final.colision_persona ADD CONSTRAINT contributing2_fk FOREIGN KEY (contributing_factor_2) REFERENCES final.accidentes(contributing_factor_vehicle_2) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
 --ALTER TABLE final.colision_persona ADD CONSTRAINT personSex_fk FOREIGN KEY (person_sex) REFERENCES final.persona(person_sex) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
-ALTER TABLE final.colision_persona ADD CONSTRAINT collisionId_fk FOREIGN KEY (collision_id) REFERENCES final.accidentes(collision_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
+--ALTER TABLE final.colision_persona ADD CONSTRAINT collisionId_fk FOREIGN KEY (collision_id) REFERENCES final.accidentes(collision_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
 
 CREATE TABLE IF NOT EXISTS  colision_vehiculos(
+    unique_id varchar(10),
+    collision_id varchar(10) not null,
     vehicle_id varchar(512) not null,
     travel_direction varchar(20),
     vehicle_occupants numeric,
@@ -95,9 +97,14 @@ CREATE TABLE IF NOT EXISTS  colision_vehiculos(
     public_property_damage varchar(20),
     public_property_damage_type text,
     contributing_factor_1 text,
-    contributing_factor_2 text,
-    collision_id varchar(10) not null
+    contributing_factor_2 text
 );
+
+--ALTER TABLE colision_vehiculos ADD CONSTRAINT vehicleId_fk foreign key(vehicle_id) references vehiculos(vehicle_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
+--ALTER TABLE colision_vehiculos ADD CONSTRAINT collisionId_fk foreign key(collision_id) references accidentes(collision_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
+--ALTER TABLE colision_vehiculos ADD CONSTRAINT contributing_factor_1_fk foreign key(contributing_factor_1) references accidentes(contributing_factor_vehicle_1) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
+--ALTER TABLE colision_vehiculos ADD CONSTRAINT contributing_factor_2_fk foreign key(contributing_factor_2) references accidentes(contributing_factor_vehicle_2) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
+--ALTER TABLE colision_vehiculos ADD CONSTRAINT colision_vehiculos_pk primary key(unique_id,collision_id);
 
 INSERT INTO final.accidentes (crash_date,
                               crash_time,
@@ -190,6 +197,7 @@ SELECT
 FROM temporal.vehiculos v;
 
 INSERT INTO colision_persona(unique_id,
+                             collision_id,
                              person_id,
                              person_type,
                              person_injury,
@@ -205,10 +213,10 @@ INSERT INTO colision_persona(unique_id,
                              ped_role,
                              contributing_factor_1,
                              contributing_factor_2,
-                             person_sex,
-                             collision_id)
+                             person_sex)
 SELECT
-    CAST(unique_id AS varchar(10)),
+    CAST(unique_id AS varchar(50)),
+    CAST(collision_id AS varchar(10)),
     CAST(person_id AS varchar(512)),
     CAST(person_type AS varchar(50)),
     CAST(person_injury AS varchar(50)),
@@ -224,11 +232,12 @@ SELECT
     CAST(ped_role AS varchar(50)),
     CAST(contributing_factor_1 AS text),
     CAST(contributing_factor_2 AS text),
-    CAST(person_sex AS char(1)),
-    CAST(collision_id AS varchar(10))
+    CAST(person_sex AS char(1))
 FROM temporal.colision_persona;
 
-INSERT INTO colision_vehiculos(vehicle_id,
+INSERT INTO colision_vehiculos(unique_id,
+                               collision_id,
+                               vehicle_id,
                                travel_direction,
                                vehicle_occupants,
                                driver_sex,
@@ -243,9 +252,10 @@ INSERT INTO colision_vehiculos(vehicle_id,
                                public_property_damage,
                                public_property_damage_type,
                                contributing_factor_1,
-                               contributing_factor_2,
-                               collision_id)
+                               contributing_factor_2)
 SELECT
+    CAST(unique_id AS varchar(10)),
+    CAST(collision_id AS varchar(10)),
     CAST(vehicle_id AS varchar(512)),
     CAST(travel_direction AS varchar(20)),
     CAST(vehicle_occupants AS numeric),
@@ -261,6 +271,5 @@ SELECT
     CAST(public_property_damage AS varchar(20)),
     CAST(public_property_damage_type AS text),
     CAST(contributing_factor_1 AS text),
-    CAST(contributing_factor_2 AS text),
-    CAST(collision_id AS varchar(10))
+    CAST(contributing_factor_2 AS text)
 FROM temporal.colision_vehiculos;
