@@ -50,12 +50,12 @@ CREATE TABLE IF NOT EXISTS vehiculos(
 );
 
 CREATE TABLE IF NOT EXISTS colision_persona(
-    unique_id varchar(50) not null,
+    unique_id varchar(10) not null,
     collision_id varchar(10) not null,
     person_id varchar(512),
     person_type varchar(50),
     person_injury varchar(50),
-    vehicle_id numeric,
+    vehicle_id varchar(512),
     person_age smallint,
     ejection varchar(50),
     emotional_status varchar(50),
@@ -220,7 +220,7 @@ SELECT
     CAST(person_id AS varchar(512)),
     CAST(person_type AS varchar(50)),
     CAST(person_injury AS varchar(50)),
-    CAST(vehicle_id AS numeric),
+    CAST(vehicle_id AS varchar(512)),
     CAST(person_age AS smallint),
     CAST(ejection AS varchar(50)),
     CAST(emotional_status AS varchar(50)),
