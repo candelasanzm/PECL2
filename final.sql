@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS persona(
 
 CREATE TABLE IF NOT EXISTS vehiculos(
     vehicle_id varchar(512) not null,
+    state_registration bpchar(2),
     vehicle_year smallint check(vehicle_year between 1000 and 2024 or null),
     vehicle_type varchar(512),
     vehicle_model varchar(50),
@@ -71,18 +72,11 @@ CREATE TABLE IF NOT EXISTS colision_persona(
     person_sex char(1) check(person_sex in ('M', 'F', 'U'))
 );
 
---ALTER TABLE final.colision_persona ADD CONSTRAINT colision_persona_pk primary key (unique_id, collision_id);
---ALTER TABLE final.colision_persona ADD CONSTRAINT personId_fk FOREIGN KEY (person_id) REFERENCES final.persona(person_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
---ALTER TABLE final.colision_persona ADD CONSTRAINT vehicleId_fk FOREIGN KEY (vehicle_id) REFERENCES final.vehiculos(vehicle_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
---ALTER TABLE final.colision_persona ADD CONSTRAINT contributing1_fk FOREIGN KEY (contributing_factor_1) REFERENCES final.accidentes(contributing_factor_vehicle_1) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
---ALTER TABLE final.colision_persona ADD CONSTRAINT contributing2_fk FOREIGN KEY (contributing_factor_2) REFERENCES final.accidentes(contributing_factor_vehicle_2) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
---ALTER TABLE final.colision_persona ADD CONSTRAINT personSex_fk FOREIGN KEY (person_sex) REFERENCES final.persona(person_sex) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
---ALTER TABLE final.colision_persona ADD CONSTRAINT collisionId_fk FOREIGN KEY (collision_id) REFERENCES final.accidentes(collision_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
-
 CREATE TABLE IF NOT EXISTS  colision_vehiculos(
     unique_id varchar(10),
     collision_id varchar(10) not null,
     vehicle_id varchar(512) not null,
+    state_registration bpchar(2),
     travel_direction varchar(20),
     vehicle_occupants numeric,
     driver_sex bpchar(1) check (driver_sex in ('U','F','M')),
@@ -99,12 +93,6 @@ CREATE TABLE IF NOT EXISTS  colision_vehiculos(
     contributing_factor_1 text,
     contributing_factor_2 text
 );
-
---ALTER TABLE colision_vehiculos ADD CONSTRAINT vehicleId_fk foreign key(vehicle_id) references vehiculos(vehicle_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
---ALTER TABLE colision_vehiculos ADD CONSTRAINT collisionId_fk foreign key(collision_id) references accidentes(collision_id) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
---ALTER TABLE colision_vehiculos ADD CONSTRAINT contributing_factor_1_fk foreign key(contributing_factor_1) references accidentes(contributing_factor_vehicle_1) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
---ALTER TABLE colision_vehiculos ADD CONSTRAINT contributing_factor_2_fk foreign key(contributing_factor_2) references accidentes(contributing_factor_vehicle_2) MATCH FULL ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
---ALTER TABLE colision_vehiculos ADD CONSTRAINT colision_vehiculos_pk primary key(unique_id,collision_id);
 
 INSERT INTO final.accidentes (crash_date,
                               crash_time,
@@ -238,6 +226,7 @@ FROM temporal.colision_persona;
 INSERT INTO colision_vehiculos(unique_id,
                                collision_id,
                                vehicle_id,
+                               state_registration,
                                travel_direction,
                                vehicle_occupants,
                                driver_sex,
@@ -257,6 +246,7 @@ SELECT
     CAST(unique_id AS varchar(10)),
     CAST(collision_id AS varchar(10)),
     CAST(vehicle_id AS varchar(512)),
+    CAST(state_registration AS bpchar(2)),
     CAST(travel_direction AS varchar(20)),
     CAST(vehicle_occupants AS numeric),
     CAST(driver_sex AS bpchar(1)),
