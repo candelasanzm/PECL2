@@ -3,7 +3,7 @@ select colision_vehiculos.vehicle_id, count(colision_vehiculos.collision_id) as 
 from colision_vehiculos
 group by vehicle_id
 having count(colision_vehiculos.collision_id) > 1
-order by NumeroAccidentes DESC ;
+order by NumeroAccidentes desc ;
 
 -- Sentencia 2
 select *
@@ -18,31 +18,12 @@ group by vehicle_make
 order by CantidadPorMarca desc
 limit 5;
 
--- Sentencia 4 (No compila)
-select colision_persona.person_id, count(colision_persona.collision_id) as NumeroAccidentes
+-- Sentencia 4
+select count(colision_persona.collision_id) as NumeroAccidentes, colision_persona.person_id
 from colision_persona
 group by person_id
 having count(colision_persona.collision_id) > 1
-order by NumeroAccidentes DESC ;
-
-select final.persona.person_id, count(accidentes.*) as NumeroAccidentes
-from final.accidentes, final.colision_persona, final.persona
-where final.persona.person_id = final.colision_persona.person_id
-    and final.accidentes.collision_id = final.colision_persona.collision_id
-group by final.persona.person_id
-having count(accidentes.*) > 1;
-
-select distinct *, (select count(*) from accidentes) as NumeroAccidentes
-from persona
-group by person_id
-having (select count(*) from accidentes) > 1;
-
-select final.persona.*, count(final.colision_persona.person_id) as numero_accidentes
-from persona, colision_persona
-where final.persona.person_id = final.colision_persona.person_id
-  and final.colision_persona.person_type in ('driver')
-group by persona.person_id, persona.person_sex, person_lastname, person_firstname, person_phone, person_address, person_city, person_state, person_zip, person_ssn, person_dob
-having count(final.colision_persona.person_id) >1;
+order by NumeroAccidentes desc;
 
 -- Sentencia 5
 select position_in_vehicle, person_id, person_age
@@ -53,32 +34,127 @@ order by person_age desc;
 -- Sentencia 6
 select distinct persona.*, vehiculos.vehicle_type
 from persona, vehiculos
-where vehiculos.vehicle_type in ('Pick-up');
+where vehiculos.vehicle_type = 'Pick-up';
 
 -- Sentencia 7
-select vehicle_make, (select count(collision_id)
-                      from colision_vehiculos
-                      group by collision_id) as NumeroAccidentes
-from vehiculos
-group by vehicle_make
-order by NumeroAccidentes desc
-limit 3;
+select v1.vehicle_make as Marca, v2.NumeroAccidentes
+from vehiculos as v1
+    inner join (select count(collision_id) as NumeroAccidentes, vehicle_id as VehicleID
+                from colision_vehiculos
+                group by vehicle_id
+                order by NumeroAccidentes asc
+                limit 3) as v2
+    on v1.vehicle_id = v2.VehicleID;
 
-select vehiculos.vehicle_make, count(colision_vehiculos.collision_id) as NumeroAccidentes
-from vehiculos, colision_vehiculos
-where final.vehiculos.vehicle_id = final.colision_vehiculos.vehicle_id
-group by vehicle_make
-order by NumeroAccidentes DESC
-limit 3;
+select v1.vehicle_make as Marca, v2.NumeroAccidentes
+from vehiculos as v1
+    inner join (select count(collision_id) as NumeroAccidentes, vehicle_id as VehicleID
+                from colision_vehiculos
+                inner join vehiculos on vehiculos.vehicle_id = colision_vehiculos.vehicle_id
+                group by vehicle_id
+                order by NumeroAccidentes asc
+                limit 3) as v2
+    on v1.vehicle_id = v2.VehicleID;
 
-select vehicle_type, count(final.colision_vehiculos.*) as numero_accidentes
-from vehiculos, colision_vehiculos
-where final.vehiculos.vehicle_id= final.colision_vehiculos.vehicle_id
-group by vehicle_type
-order by numero_accidentes asc
-limit 3;
+--(No va)
+select v1.vehicle_type as TipoVehiculo, v2.NumeroAccidentes
+from vehiculos as v1
+    inner join (select count(collision_id) as NumeroAccidentes, colision_vehiculos.vehicle_id
+                from colision_vehiculos
+                inner join vehiculos on vehiculos.vehicle_id = colision_vehiculos.vehicle_id
+                group by vehiculos.vehicle_type, colision_vehiculos.vehicle_id
+                order by NumeroAccidentes asc
+                limit 3) as v2
+    on v1.vehicle_id = v2.vehicle_id;
 
 -- Sentencia 8 (No compila)
+SELECT
+    v.vehicle_make AS Marca,
+    COUNT(DISTINCT cv.collision_id) AS NumeroAccidentes
+FROM
+    vehiculos v
+INNER JOIN
+    colision_vehiculos cv
+ON
+    v.vehicle_id = cv.vehicle_id
+GROUP BY
+    v.vehicle_make
+ORDER BY
+    NumeroAccidentes ASC;
+
+
+SELECT
+    v.vehicle_make AS Marca,
+    COUNT(cv.collision_id) AS NumeroAccidentes
+FROM
+    vehiculos v
+INNER JOIN
+    colision_vehiculos cv
+ON
+    v.vehicle_id = cv.vehicle_id
+WHERE
+    v.vehicle_make IS NOT NULL
+GROUP BY
+    v.vehicle_make
+ORDER BY
+    NumeroAccidentes ASC;
+
+
+SELECT
+    v.vehicle_make AS Marca,
+    COUNT(cv.collision_id) AS NumeroAccidentes
+FROM
+    vehiculos v
+INNER JOIN
+    colision_vehiculos cv
+ON
+    v.vehicle_id = cv.vehicle_id
+GROUP BY
+    v.vehicle_make
+ORDER BY
+    NumeroAccidentes ASC;
+
+
+
+select v.vehicle_make as Marca, count(cv.collision_id) as NumeroAccidentes
+from vehiculos v
+left join colision_vehiculos cv on v.vehicle_id = cv.vehicle_id
+group by v.vehicle_make
+order by NumeroAccidentes asc
+limit 100;
+
+
+select v1.vehicle_make as Marca, v2.NumeroAccidentes
+from vehiculos as v1
+    inner join (select count(collision_id) as NumeroAccidentes
+                from colision_vehiculos
+                inner join vehiculos on vehiculos.vehicle_id = colision_vehiculos.vehicle_id
+                group by vehicle_make
+                order by NumeroAccidentes asc) as v2
+    on v1.vehicle_id = v2.VehicleID;
+
+select v1.vehicle_make as Marca, v2.NumeroAccidentes
+from vehiculos as v1
+    inner join (select count(collision_id) as NumeroAccidentes, vehicle_make as MarcaVehiculo
+                from colision_vehiculos, vehiculos
+                inner join vehiculos on vehiculos.vehicle_id = colision_vehiculos.vehicle_id
+                group by vehicle_id
+                order by NumeroAccidentes asc) as v2
+    on v1.vehicle_id = v2.vehicle_id;
+
+select vehicle_make as Marca, (select count(collision_id), vehicle_make as MarcaVehiculo
+                               from colision_vehiculos, vehiculos
+                               inner join vehiculos on vehiculos.vehicle_id =
+                               group by vehicle_make) as NumeroAccidentes
+from vehiculos
+order by NumeroAccidentes asc;
+
+select count(collision_id) as NumeroAccidentes, vehicle_make as MarcaVehiculo
+                               from colision_vehiculos
+                               inner join vehiculos on vehiculos.vehicle_id = colision_vehiculos.vehicle_id
+                               group by vehicle_make
+                               order by NumeroAccidentes asc
+
 select vehiculos.vehicle_make as Marca, count(accidentes.*) as NumeroAccidentesMarca
 from vehiculos, accidentes, colision_vehiculos
 where vehiculos.vehicle_id = colision_vehiculos.vehicle_id
