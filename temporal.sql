@@ -6,7 +6,7 @@ CREATE SCHEMA IF NOT EXISTS temporal;
 
 CREATE SCHEMA IF NOT EXISTS final;
 
-CREATE TABLE IF NOT EXISTS accidentes(
+CREATE TABLE IF NOT EXISTS temp_accidentes(
     crash_date TEXT,
     crash_time TEXT,
     borough TEXT,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS accidentes(
     vehicle_type_code_5 TEXT
 );
 
-CREATE TABLE IF NOT EXISTS persona(
+CREATE TABLE IF NOT EXISTS temp_persona(
     person_id TEXT,
     person_sex TEXT,
     person_lastName TEXT,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS persona(
     person_dob TEXT
 );
 
-CREATE TABLE IF NOT EXISTS vehiculos(
+CREATE TABLE IF NOT EXISTS temp_vehiculos(
     vehicle_id TEXT,
     vehicle_year TEXT,
     vehicle_type TEXT,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS vehiculos(
     vehicle_make TEXT
 );
 
-CREATE TABLE IF NOT EXISTS colision_persona(
+CREATE TABLE IF NOT EXISTS temp_colisionPersona(
     unique_id TEXT,
     collision_id TEXT,
     crash_date TEXT,
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS colision_persona(
     person_sex TEXT
 );
 
-CREATE TABLE IF NOT EXISTS colision_vehiculos(
+CREATE TABLE IF NOT EXISTS temp_colisionVehiculos(
     unique_id TEXT,
     collision_id TEXT,
     crash_date TEXT,
@@ -112,22 +112,22 @@ CREATE TABLE IF NOT EXISTS colision_vehiculos(
     contributing_factor_2 TEXT
 );
 
-COPY temporal.accidentes
+COPY temporal.temp_accidentes
 FROM 'C:\Collisions_Crashes_20241020.csv'
 WITH CSV HEADER NULL '' DELIMITER ',';
 
-COPY temporal.persona
+COPY temporal.temp_persona
 FROM 'C:\personas2.csv'
 WITH CSV HEADER NULL '' DELIMITER ';' QUOTE '"';
 
-COPY temporal.vehiculos
+COPY temporal.tyemp_vehiculos
 FROM 'C:\Vehicles.csv'
 WITH CSV HEADER NULL '' DELIMITER ';';
 
-COPY temporal.colision_persona
+COPY temporal.temp_colisionPersona
 FROM 'C:\Collisions_Person_20241020.csv'
 WITH (FORMAT csv, HEADER true, DELIMITER ',', NULL '', QUOTE '"', ESCAPE '"');
 
-COPY temporal.colision_vehiculos
+COPY temporal.temp_colisionVehiculos
 FROM 'C:\Collisions_Vehicles_20241020.csv'
 WITH CSV HEADER NULL '' DELIMITER ',';

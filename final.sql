@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS accidentes(
+CREATE TABLE IF NOT EXISTS final_accidentes(
     crash_date date,
     crash_time time without time zone,
     borough varchar(512),
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS accidentes(
     constraint accidentes_pk primary key(collision_id)
 );
 
-CREATE TABLE IF NOT EXISTS persona(
+CREATE TABLE IF NOT EXISTS final_persona(
     person_id varchar(512),
     person_sex char(1) check(person_sex in ('M', 'F', 'U')),
     person_lastName varchar(50),
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS persona(
     constraint persona_pk primary key (person_id)
 );
 
-CREATE TABLE IF NOT EXISTS vehiculos(
+CREATE TABLE IF NOT EXISTS final_vehiculos(
     vehicle_id varchar(512) not null,
     state_registration bpchar(2),
     vehicle_year smallint check(vehicle_year between 1000 and 2024 or null),
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS vehiculos(
     vehicle_make varchar(50)
 );
 
-CREATE TABLE IF NOT EXISTS colision_persona(
+CREATE TABLE IF NOT EXISTS final_colisionPersona(
     unique_id varchar(10) not null,
     collision_id varchar(10) not null,
     person_id varchar(512),
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS colision_persona(
     person_sex char(1) check(person_sex in ('M', 'F', 'U'))
 );
 
-CREATE TABLE IF NOT EXISTS  colision_vehiculos(
+CREATE TABLE IF NOT EXISTS  final_colisionVehiculos(
     unique_id varchar(10),
     collision_id varchar(10) not null,
     vehicle_id varchar(512) not null,
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS  colision_vehiculos(
     contributing_factor_2 text
 );
 
-INSERT INTO final.accidentes (crash_date,
+INSERT INTO final.final_accidentes (crash_date,
                               crash_time,
                               borough,
                               zip_code,
@@ -143,9 +143,9 @@ SELECT
     CAST(contributing_factor_vehicle_4 AS text),
     CAST(contributing_factor_vehicle_5 AS text),
     CAST(collision_id AS varchar(10))
-FROM temporal.accidentes;
+FROM temporal.temp_accidentes;
 
-INSERT INTO final.persona(person_id,
+INSERT INTO final.final_persona(person_id,
                           person_sex,
                           person_lastName,
                           person_firstName,
@@ -169,9 +169,9 @@ SELECT
     CAST(person_ssn AS varchar(11)),
     CAST(person_dob AS date)
 
-FROM temporal.persona;
+FROM temporal.temp_persona;
 
-INSERT INTO vehiculos(vehicle_id,
+INSERT INTO final.final_vehiculos(vehicle_id,
                       vehicle_year,
                       vehicle_type,
                       vehicle_model,
@@ -182,9 +182,9 @@ SELECT
     CAST(v.vehicle_type AS VARCHAR(512)),
     CAST(v.vehicle_model AS VARCHAR(50)),
     CAST(v.vehicle_make AS VARCHAR(50))
-FROM temporal.vehiculos v;
+FROM temporal.temp_vehiculos v;
 
-INSERT INTO colision_persona(unique_id,
+INSERT INTO final.final_colisionPersona(unique_id,
                              collision_id,
                              person_id,
                              person_type,
@@ -221,9 +221,9 @@ SELECT
     CAST(contributing_factor_1 AS text),
     CAST(contributing_factor_2 AS text),
     CAST(person_sex AS char(1))
-FROM temporal.colision_persona;
+FROM temporal.temp_colisionPersona;
 
-INSERT INTO colision_vehiculos(unique_id,
+INSERT INTO final.final_colisionVehiculos(unique_id,
                                collision_id,
                                vehicle_id,
                                state_registration,
@@ -262,4 +262,4 @@ SELECT
     CAST(public_property_damage_type AS text),
     CAST(contributing_factor_1 AS text),
     CAST(contributing_factor_2 AS text)
-FROM temporal.colision_vehiculos;
+FROM temporal.temp_colisionVehiculos;
